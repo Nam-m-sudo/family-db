@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Create a Branch Link</h1>
+<p class="sub">One of these per family. Send the generated link to that family only — it opens straight to their part of the tree, no login needed.</p>
+
+<div class="card">
+  <form method="post">
+    <label for="anchor_person_id">This branch descends from</label>
+    <select name="anchor_person_id" id="anchor_person_id" required>
+      {% for p in possible_anchors %}
+        <option value="{{ p.id }}">{{ p.name }} ({{ p.relation_type }})</option>
+      {% endfor %}
+    </select>
+
+    <label for="label">Label (for your own reference)</label>
+    <input type="text" name="label" id="label" placeholder="e.g. Branch 3 — Ramachandra's family" required>
+
+    <div class="row2">
+      <div>
+        <label for="contact_name">Contact person in that family (optional)</label>
+        <input type="text" name="contact_name" id="contact_name">
+      </div>
+      <div>
+        <label for="contact_phone">Their phone (optional)</label>
+        <input type="text" name="contact_phone" id="contact_phone">
+      </div>
+    </div>
+
+    <button type="submit">Create link</button>
+  </form>
+</div>
+<p><a href="{{ url_for('admin_dashboard') }}">&larr; Back to dashboard</a></p>
+{% endblock %}

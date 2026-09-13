@@ -1,0 +1,74 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}{{ site_name }} — Family Tree{% endblock %}</title>
+  <style>
+    body { font-family: system-ui, sans-serif; background: #faf7f2; color: #2c2620; margin: 0; }
+    .wrap { max-width: 760px; margin: 0 auto; padding: 24px 16px 60px; }
+    h1 { font-size: 1.4rem; margin-bottom: 4px; }
+    h2 { font-size: 1.1rem; margin-top: 28px; }
+    .sub { color: #7a6f60; margin-top: 0; margin-bottom: 20px; }
+    .card { background: #fff; border: 1px solid #e7ddcf; border-radius: 10px; padding: 16px; margin-bottom: 14px; }
+    .flash { padding: 10px 14px; border-radius: 8px; margin-bottom: 12px; }
+    .flash.success { background: #e5f4e6; color: #275c2b; }
+    .flash.danger { background: #fbe6e6; color: #7a2323; }
+    label { display: block; font-size: 0.85rem; margin: 10px 0 4px; color: #4a4136; }
+    input, select, textarea { width: 100%; box-sizing: border-box; padding: 8px 10px; border: 1px solid #d8cdba; border-radius: 6px; font-size: 0.95rem; }
+    .row2 { display: flex; gap: 12px; }
+    .row2 > div { flex: 1; }
+    button, .btn { display: inline-block; background: #8a5a2b; color: #fff; border: none; padding: 9px 16px; border-radius: 6px; font-size: 0.95rem; cursor: pointer; text-decoration: none; margin-top: 14px; }
+    .btn.secondary { background: #6b6255; }
+    .tree-row { padding: 6px 0; border-bottom: 1px dashed #eee0cc; font-size: 0.95rem; }
+    .tag { font-size: 0.75rem; padding: 2px 7px; border-radius: 10px; background: #f1e6d3; color: #6b5a3a; margin-left: 6px; }
+    .note { background: #fff6e0; border: 1px solid #f0dfa8; padding: 10px 12px; border-radius: 8px; font-size: 0.9rem; margin-bottom: 14px; }
+    a { color: #8a5a2b; }
+    .kn { color: #8a7c63; font-weight: normal; }
+    .hint { font-size: 0.8rem; color: #8a7c63; margin-top: -2px; margin-bottom: 4px; }
+    .linklike { background: none; border: none; color: #a33; text-decoration: underline; cursor: pointer; padding: 0; margin: 0; font-size: 0.85rem; font-family: inherit; }
+
+    /* Visual family tree (CSS-only org chart) */
+    .wide .wrap { max-width: none; padding-left: 16px; padding-right: 16px; }
+    .tree-wrap { overflow-x: auto; padding: 10px 0 30px; }
+    .tree, .tree ul, .tree li { list-style: none; margin: 0; padding: 0; position: relative; }
+    .tree { display: flex; justify-content: center; width: max-content; min-width: 100%; }
+    .tree ul { display: flex; padding-top: 24px; position: relative; }
+    .tree li { display: flex; flex-direction: column; align-items: center; padding: 24px 10px 0 10px; position: relative; }
+    .tree li::before, .tree li::after {
+      content: ''; position: absolute; top: 0; right: 50%;
+      border-top: 2px solid #d8c6a6; width: 50%; height: 24px;
+    }
+    .tree li::after { right: auto; left: 50%; border-left: 2px solid #d8c6a6; }
+    .tree li:only-child::before, .tree li:only-child::after { display: none; }
+    .tree li:only-child { padding-top: 0; }
+    .tree li:first-child::before { border: 0 none; }
+    .tree li:last-child::after { border: 0 none; }
+    .tree li:last-child::before { border-right: 2px solid #d8c6a6; border-radius: 0 6px 0 0; }
+    .tree li:first-child::after { border-radius: 6px 0 0 0; }
+    .tree ul ul::before {
+      content: ''; position: absolute; top: 0; left: 50%;
+      border-left: 2px solid #d8c6a6; width: 0; height: 24px;
+    }
+    .person-box { border: 1px solid #d8cdba; border-radius: 8px; padding: 8px 10px; background: #fff; text-align: center; min-width: 118px; box-shadow: 0 1px 2px rgba(0,0,0,0.04); }
+    .person-box .pname { font-weight: 600; color: #2c2620; text-decoration: none; font-size: 0.85rem; display: block; line-height: 1.3; }
+    .person-box .pname:hover { text-decoration: underline; }
+    .person-box .ptag { font-size: 0.68rem; color: #8a7c63; margin-top: 2px; }
+    .person-actions { font-size: 0.68rem; margin-top: 5px; white-space: nowrap; }
+    .person-actions a, .person-actions .linklike { font-size: 0.68rem; margin: 0 2px; }
+    .couple { display: flex; align-items: center; }
+    .couple-connector { width: 16px; height: 2px; background: #d8c6a6; flex-shrink: 0; }
+    .spouse-box { border-color: #e0c9a6; background: #fffaf2; }
+  </style>
+</head>
+<body class="{% block bodyclass %}{% endblock %}">
+  <div class="wrap">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, msg in messages %}
+        <div class="flash {{ category }}">{{ msg }}</div>
+      {% endfor %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+  </div>
+</body>
+</html>

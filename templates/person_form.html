@@ -1,0 +1,252 @@
+{% extends "base.html" %}
+{% block content %}
+{% if person %}
+<h1>Edit Family Member <span class="kn">/ ಸದಸ್ಯರ ವಿವರ ತಿದ್ದುಪಡಿ</span></h1>
+{% else %}
+<h1>Add a Family Member <span class="kn">/ ಕುಟುಂಬ ಸದಸ್ಯರನ್ನು ಸೇರಿಸಿ</span></h1>
+{% endif %}
+{% if branch %}<p class="sub">{{ branch.label }}</p>{% endif %}
+
+<div class="note">
+  {% if is_anchor %}
+  This is you / the person this branch starts from — your position in the wider family tree is fixed by the admin, but everything below is your own details to fill in or correct.
+  <br><span class="kn">ಇದು ನೀವೇ / ಈ ಶಾಖೆ ಪ್ರಾರಂಭವಾಗುವ ವ್ಯಕ್ತಿ — ಕುಟುಂಬ ವೃಕ್ಷದಲ್ಲಿ ನಿಮ್ಮ ಸ್ಥಾನವನ್ನು ನಿರ್ವಾಹಕರು ನಿಗದಿಪಡಿಸಿದ್ದಾರೆ, ಆದರೆ ಉಳಿದ ವಿವರಗಳನ್ನು ನೀವು ತುಂಬಬಹುದು ಅಥವಾ ಸರಿಪಡಿಸಬಹುದು.</span>
+  {% else %}
+  If you're adding more than one child under the same person, please add them <strong>eldest first, then next eldest</strong>.
+  <br><span class="kn">ಒಂದೇ ವ್ಯಕ್ತಿಯ ಅಡಿಯಲ್ಲಿ ಒಂದಕ್ಕಿಂತ ಹೆಚ್ಚು ಮಕ್ಕಳನ್ನು ಸೇರಿಸುತ್ತಿದ್ದರೆ, ದಯವಿಟ್ಟು ಹಿರಿಯರಿಂದ ಕಿರಿಯರವರೆಗೆ ಕ್ರಮವಾಗಿ ಸೇರಿಸಿ.</span>
+  {% endif %}
+</div>
+
+<div class="card">
+  <form method="post" id="personForm" action="{% if person %}{% if branch %}{{ url_for('branch_edit_person', token=branch.token, person_id=person.id) }}{% else %}{{ url_for('admin_root_edit_person', person_id=person.id) }}{% endif %}{% else %}{% if branch %}{{ url_for('branch_add_person', token=branch.token) }}{% else %}{{ url_for('admin_root_add_person') }}{% endif %}{% endif %}">
+
+    {% if not is_anchor %}
+    <label>Adding this person under <span class="kn">/ ಯಾರ ಅಡಿಯಲ್ಲಿ ಸೇರಿಸುತ್ತಿದ್ದೀರಿ</span></label>
+    <select name="parent_id" id="parent_id" required onchange="updateRelationOptions()">
+      {% for p in people_for_dropdown %}
+        <option value="{{ p.id }}" data-gender="{{ p.gender }}" {% if p.id == default_parent_id %}selected{% endif %}>{{ p.name }}{% if p.name_kn %} / {{ p.name_kn }}{% endif %}</option>
+      {% endfor %}
+    </select>
+
+    <label>This person is their <span class="kn">/ ಇವರ ಸಂಬಂಧ</span></label>
+    <div class="hint">Son/daughter of the selected person, or their spouse — the spouse option below switches to husband/wife automatically based on the selected person's gender.</div>
+    <select name="relation_type" id="relation_type" onchange="toggleSiblingOrder()">
+      {% for r in relations %}
+        <option value="{{ r }}" id="opt_{{ r }}" {% if r == default_relation %}selected{% endif %}>
+          {{ r }}{% if r == 'son' %} / ಮಗ{% elif r == 'daughter' %} / ಮಗಳು{% elif r == 'wife' %} / ಪತ್ನಿ{% elif r == 'husband' %} / ಪತಿ{% endif %}
+        </option>
+      {% endfor %}
+    </select>
+    {% endif %}
+
+    <div id="sibling_order_field">
+      <label>Birth order among siblings, 1 = eldest <span class="kn">/ ಜನ್ಮ ಕ್ರಮ (1 = ಹಿರಿಯ)</span></label>
+      <input type="number" name="sibling_order" id="sibling_order" value="{{ person.sibling_order if person else 1 }}" min="1">
+    </div>
+
+    <div class="row2">
+      <div>
+        <label for="name">Name (English) <span class="kn">/ ಹೆಸರು</span></label>
+        <input type="text" name="name" id="name" value="{{ person.name if person else '' }}" required>
+      </div>
+      <div>
+        <label for="name_kn">Name (Kannada) <span class="kn">/ ಹೆಸರು (ಕನ್ನಡ)</span></label>
+        <input type="text" name="name_kn" id="name_kn" value="{{ person.name_kn if person else '' }}">
+        <div class="hint">Fills in as you type the English name — please check and correct it.</div>
+      </div>
+    </div>
+
+    <label>Status <span class="kn">/ ಸ್ಥಿತಿ</span></label>
+    <select name="alive_status" id="alive_status" onchange="toggleDod()">
+      {% for s in statuses %}
+        <option value="{{ s }}" {% if person and person.alive_status == s %}selected{% endif %}>{{ s }}{% if s == 'Alive' %} / ಜೀವಂತ{% else %} / ಮೃತ{% endif %}</option>
+      {% endfor %}
+    </select>
+
+    <label for="dob">Date of birth (DD-MM-YYYY) <span class="kn">/ ಜನ್ಮ ದಿನಾಂಕ</span></label>
+    <input type="text" name="dob" id="dob" value="{{ person.dob if person else '' }}" placeholder="e.g. 05-11-1990" oninput="updateAge()">
+    <p class="sub" id="age_display" style="margin-top: -8px;"></p>
+
+    <div id="dod_field">
+      <label for="dod">Date of death <span class="kn">/ ಮರಣ ದಿನಾಂಕ</span></label>
+      <input type="text" name="dod" id="dod" value="{{ person.dod if person else '' }}" placeholder="DD-MM-YYYY">
+      <div class="hint">Masa / Paksha / Thithi at death — used to fix the yearly shraddha date <span class="kn">/ ಮರಣ ಮಾಸ, ಪಕ್ಷ, ತಿಥಿ</span></div>
+      <div class="row2">
+        <div>
+          <label for="dod_masa">Masa <span class="kn">/ ಮಾಸ</span></label>
+          <select name="dod_masa" id="dod_masa">
+            <option value="">—</option>
+            {% for key, en, kn in masas %}<option value="{{ key }}" {% if person and person.dod_masa == key %}selected{% endif %}>{{ en }} / {{ kn }}</option>{% endfor %}
+          </select>
+        </div>
+        <div>
+          <label for="dod_paksha">Paksha <span class="kn">/ ಪಕ್ಷ</span></label>
+          <select name="dod_paksha" id="dod_paksha">
+            <option value="">—</option>
+            {% for key, en, kn in pakshas %}<option value="{{ key }}" {% if person and person.dod_paksha == key %}selected{% endif %}>{{ en }} / {{ kn }}</option>{% endfor %}
+          </select>
+        </div>
+        <div>
+          <label for="dod_thithi">Thithi <span class="kn">/ ತಿಥಿ</span></label>
+          <select name="dod_thithi" id="dod_thithi">
+            <option value="">—</option>
+            {% for key, en, kn in thithis %}<option value="{{ key }}" {% if person and person.dod_thithi == key %}selected{% endif %}>{{ en }} / {{ kn }}</option>{% endfor %}
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="row2">
+      <div>
+        <label for="nakshatra">Nakshatra <span class="kn">/ ನಕ್ಷತ್ರ</span></label>
+        <select name="nakshatra" id="nakshatra" onchange="toggleOther('nakshatra')">
+          <option value="">—</option>
+          {% for key, en, kn in nakshatras %}<option value="{{ key }}" {% if person and ((person.nakshatra == key) or (key == 'Other' and nakshatra_is_other)) %}selected{% endif %}>{{ en }} / {{ kn }}</option>{% endfor %}
+        </select>
+        <div id="nakshatra_other_wrap" style="display:none;">
+          <label for="nakshatra_other">Type the nakshatra <span class="kn">/ ನಕ್ಷತ್ರ ಬರೆಯಿರಿ</span></label>
+          <input type="text" name="nakshatra_other" id="nakshatra_other" value="{{ person.nakshatra if (person and nakshatra_is_other) else '' }}">
+        </div>
+      </div>
+      <div>
+        <label for="gothra">Gothra <span class="kn">/ ಗೋತ್ರ</span></label>
+        <select name="gothra" id="gothra" onchange="toggleOther('gothra')">
+          <option value="">—</option>
+          {% for key, en, kn in gothras %}<option value="{{ key }}" {% if person and ((person.gothra == key) or (key == 'Other' and gothra_is_other)) %}selected{% endif %}>{{ en }} / {{ kn }}</option>{% endfor %}
+        </select>
+        <div id="gothra_other_wrap" style="display:none;">
+          <label for="gothra_other">Type the gothra <span class="kn">/ ಗೋತ್ರ ಬರೆಯಿರಿ</span></label>
+          <input type="text" name="gothra_other" id="gothra_other" value="{{ person.gothra if (person and gothra_is_other) else '' }}">
+        </div>
+      </div>
+    </div>
+
+    <label for="address">Address <span class="kn">/ ವಿಳಾಸ</span></label>
+    <textarea name="address" id="address" rows="2">{{ person.address if person else '' }}</textarea>
+
+    <div class="row2">
+      <div>
+        <label for="phone">Phone <span class="kn">/ ಫೋನ್ ನಂಬರ್</span></label>
+        <input type="text" name="phone" id="phone" value="{{ person.phone if person else '' }}">
+      </div>
+      <div>
+        <label for="email">Email <span class="kn">/ ಇಮೇಲ್</span></label>
+        <input type="email" name="email" id="email" value="{{ person.email if person else '' }}">
+      </div>
+    </div>
+
+    <label for="maps_link">Google Maps house link, optional <span class="kn">/ ಗೂಗಲ್ ಮ್ಯಾಪ್ಸ್ ಮನೆ ಲಿಂಕ್</span></label>
+    <input type="text" name="maps_link" id="maps_link" value="{{ person.maps_link if person else '' }}">
+
+    <button type="submit">Save <span class="kn">/ ಉಳಿಸಿ</span></button>
+  </form>
+
+  {% if person %}
+  <form method="post"
+        action="{% if branch %}{{ url_for('branch_delete_person', token=branch.token, person_id=person.id) }}{% else %}{{ url_for('admin_root_delete_person', person_id=person.id) }}{% endif %}"
+        onsubmit="return confirm('Delete {{ person.name }} and everyone entered under them? This cannot be undone.');">
+    <button type="submit" class="btn secondary">Delete this person <span class="kn">/ ಅಳಿಸಿ</span></button>
+  </form>
+  {% endif %}
+</div>
+
+<p>
+  {% if branch %}
+    <a href="{{ url_for('branch_home', token=branch.token) }}">&larr; Back to family tree</a>
+  {% else %}
+    <a href="{{ url_for('admin_root_home') }}">&larr; Back to family tree</a>
+  {% endif %}
+</p>
+
+<script>
+function toggleDod() {
+  var status = document.getElementById('alive_status').value;
+  document.getElementById('dod_field').style.display = (status === 'Dead') ? 'block' : 'none';
+}
+function toggleSiblingOrder() {
+  var relEl = document.getElementById('relation_type');
+  if (!relEl) return;  // anchor edit: no relation field shown, sibling order stays as-is
+  var relation = relEl.value;
+  document.getElementById('sibling_order_field').style.display = (relation === 'wife' || relation === 'husband') ? 'none' : 'block';
+}
+function updateRelationOptions() {
+  var parentEl = document.getElementById('parent_id');
+  var relEl = document.getElementById('relation_type');
+  if (!parentEl || !relEl) return;  // anchor edit: no parent/relation fields shown
+  var selectedParent = parentEl.options[parentEl.selectedIndex];
+  var parentGender = selectedParent ? selectedParent.getAttribute('data-gender') : '';
+  var wifeOpt = document.getElementById('opt_wife');
+  var husbandOpt = document.getElementById('opt_husband');
+  if (!wifeOpt || !husbandOpt) return;
+  if (parentGender === 'Female') {
+    wifeOpt.style.display = 'none';
+    wifeOpt.disabled = true;
+    husbandOpt.style.display = '';
+    husbandOpt.disabled = false;
+    if (relEl.value === 'wife') relEl.value = 'son';
+  } else {
+    husbandOpt.style.display = 'none';
+    husbandOpt.disabled = true;
+    wifeOpt.style.display = '';
+    wifeOpt.disabled = false;
+    if (relEl.value === 'husband') relEl.value = 'son';
+  }
+  toggleSiblingOrder();
+}
+function toggleOther(field) {
+  var val = document.getElementById(field).value;
+  document.getElementById(field + '_other_wrap').style.display = (val === 'Other') ? 'block' : 'none';
+}
+function updateAge() {
+  var val = document.getElementById('dob').value.trim();
+  var parts = val.split('-');
+  var out = document.getElementById('age_display');
+  if (parts.length === 3) {
+    var d = parseInt(parts[0], 10), m = parseInt(parts[1], 10), y = parseInt(parts[2], 10);
+    var born = new Date(y, m - 1, d);
+    if (!isNaN(born.getTime())) {
+      var today = new Date();
+      var age = today.getFullYear() - born.getFullYear();
+      var hasHadBirthday = (today.getMonth() > born.getMonth()) ||
+        (today.getMonth() === born.getMonth() && today.getDate() >= born.getDate());
+      if (!hasHadBirthday) age--;
+      out.textContent = 'Age: ' + age + ' years';
+      return;
+    }
+  }
+  out.textContent = '';
+}
+
+// Live Kannada suggestion: fills in as you type the English name, debounced
+// so it doesn't call the server on every keystroke. It keeps suggesting on
+// every change to the English name — it only skips overwriting the Kannada
+// box if you've manually changed it away from the last suggestion, so your
+// correction sticks. Clear the Kannada box (or leave it matching the last
+// suggestion) and auto-fill picks back up.
+var lastKnSuggestion = {{ (person.name_kn if person else '') | tojson }};
+var knTimer = null;
+document.getElementById('name').addEventListener('input', function () {
+  var name = this.value.trim();
+  clearTimeout(knTimer);
+  if (!name) return;
+  knTimer = setTimeout(function () {
+    fetch('/api/transliterate?text=' + encodeURIComponent(name))
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        if (!data.kannada) return;
+        var knField = document.getElementById('name_kn');
+        if (knField.value === lastKnSuggestion || knField.value === '') {
+          knField.value = data.kannada;
+          lastKnSuggestion = data.kannada;
+        }
+      })
+      .catch(function () { /* leave it as-is if this fails */ });
+  }, 350);
+});
+
+toggleDod();
+updateRelationOptions();
+toggleOther('nakshatra');
+toggleOther('gothra');
+</script>
+{% endblock %}

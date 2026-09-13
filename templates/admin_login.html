@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Admin Login</h1>
+<p class="sub">For you (the family admin) only.</p>
+<div class="card">
+  <form method="post">
+    <label for="password">Admin password</label>
+    <input type="password" name="password" id="password" required autofocus>
+    <button type="submit">Login</button>
+  </form>
+</div>
+{% endblock %}

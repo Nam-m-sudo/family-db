@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block bodyclass %}wide{% endblock %}
+{% block content %}
+{% if branch %}
+<h1>{{ branch.label }}</h1>
+<p class="sub">Add your family, starting from {{ branch.anchor_person.name }}. Please add children eldest → youngest. Click a box to view or edit that person.
+<br><span class="kn">ನಿಮ್ಮ ಕುಟುಂಬವನ್ನು {{ branch.anchor_person.name }} ಇಂದ ಪ್ರಾರಂಭಿಸಿ ಸೇರಿಸಿ. ಒಬ್ಬ ವ್ಯಕ್ತಿಯ ವಿವರ ನೋಡಲು/ತಿದ್ದಲು ಅವರ ಪೆಟ್ಟಿಗೆಯನ್ನು ಕ್ಲಿಕ್ ಮಾಡಿ.</span></p>
+{% else %}
+<h1>{{ site_name }} <span class="kn">/ ಮಾವತ್ತೂರು ಕುಟುಂಬ</span></h1>
+<p class="sub"><a href="{{ url_for('admin_dashboard') }}">&larr; Back to dashboard</a></p>
+{% endif %}
+
+{% macro person_box(p, extra_class='') %}
+<div class="person-box {{ extra_class }}">
+  <a class="pname" href="{% if branch %}{{ url_for('branch_edit_person', token=branch.token, person_id=p.id) }}{% else %}{{ url_for('admin_root_edit_person', person_id=p.id) }}{% endif %}">
+    {{ p.name }}{% if p.name_kn %}<br>{{ p.name_kn }}{% endif %}
+  </a>
+  <div class="ptag">
+    {{ p.relation_type }}{% if p.alive_status == 'Dead' %} · dead{% endif %}{% if p.age() %} · age {{ p.age() }}{% endif %}
+  </div>
+  <div class="person-actions">
+    {% if branch %}
+      {% if p.relation_type not in ('wife', 'husband') %}
+        <a href="{{ url_for('branch_add_person', token=branch.token, parent_id=p.id) }}">+ add</a>
+      {% endif %}
+      {% if p.id != branch.anchor_person_id %}
+      <form method="post" action="{{ url_for('branch_delete_person', token=branch.token, person_id=p.id) }}" style="display:inline;"
+            onsubmit="return confirm('Delete {{ p.name }} and everyone entered under them? This cannot be undone.');">
+        <button type="submit" class="linklike">del</button>
+      </form>
+      {% endif %}
+    {% else %}
+      {% if p.relation_type not in ('wife', 'husband') %}
+        <a href="{{ url_for('admin_root_add_person', parent_id=p.id) }}">+ add</a>
+      {% endif %}
+      <form method="post" action="{{ url_for('admin_root_delete_person', person_id=p.id) }}" style="display:inline;"
+            onsubmit="return confirm('Delete {{ p.name }} and everyone entered under them? This cannot be undone.');">
+        <button type="submit" class="linklike">del</button>
+      </form>
+    {% endif %}
+  </div>
+</div>
+{% endmacro %}
+
+{% macro render_node(node) %}
+<li>
+  <div class="couple">
+    {{ person_box(node.person) }}
+    {% for s in node.spouses %}
+      <div class="couple-connector"></div>
+      {{ person_box(s.person, 'spouse-box') }}
+    {% endfor %}
+  </div>
+  {% if node.children %}
+  <ul>
+    {% for child in node.children %}{{ render_node(child) }}{% endfor %}
+  </ul>
+  {% endif %}
+</li>
+{% endmacro %}
+
+<div class="tree-wrap">
+  <div class="tree">
+    <ul>
+      {{ render_node(tree) }}
+    </ul>
+  </div>
+</div>
+
+{% if branch %}
+<form method="post" action="{{ url_for('branch_mark_done', token=branch.token) }}">
+  <button type="submit" class="btn secondary">Mark our family as fully entered <span class="kn">/ ಪೂರ್ಣಗೊಂಡಿದೆ</span></button>
+</form>
+{% endif %}
+{% endblock %}

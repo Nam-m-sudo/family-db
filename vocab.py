@@ -1,0 +1,98 @@
+# Same fixed vocab as the main Mavathoor Family website's family_vocab.py,
+# kept in sync so a person's nakshatra/gothra value matches between apps.
+# Each entry is (key, english_label, kannada_label). `key` is what gets
+# stored in the database.
+
+NAKSHATRAS = [
+    ("Ashwini", "Ashwini", "ಅಶ್ವಿನಿ"),
+    ("Bharani", "Bharani", "ಭರಣಿ"),
+    ("Krittika", "Krittika", "ಕೃತ್ತಿಕಾ"),
+    ("Rohini", "Rohini", "ರೋಹಿಣಿ"),
+    ("Mrigashira", "Mrigashira", "ಮೃಗಶಿರ"),
+    ("Ardra", "Ardra", "ಆರ್ದ್ರಾ"),
+    ("Punarvasu", "Punarvasu", "ಪುನರ್ವಸು"),
+    ("Pushya", "Pushya", "ಪುಷ್ಯ"),
+    ("Ashlesha", "Ashlesha", "ಆಶ್ಲೇಷ"),
+    ("Magha", "Magha", "ಮಘಾ"),
+    ("Purva Phalguni", "Purva Phalguni", "ಪೂರ್ವ ಫಲ್ಗುಣಿ"),
+    ("Uttara Phalguni", "Uttara Phalguni", "ಉತ್ತರ ಫಲ್ಗುಣಿ"),
+    ("Hasta", "Hasta", "ಹಸ್ತ"),
+    ("Chitra", "Chitra", "ಚಿತ್ರಾ"),
+    ("Swati", "Swati", "ಸ್ವಾತಿ"),
+    ("Vishakha", "Vishakha", "ವಿಶಾಖಾ"),
+    ("Anuradha", "Anuradha", "ಅನುರಾಧಾ"),
+    ("Jyeshtha", "Jyeshtha", "ಜ್ಯೇಷ್ಠಾ"),
+    ("Mula", "Mula", "ಮೂಲಾ"),
+    ("Purva Ashadha", "Purva Ashadha", "ಪೂರ್ವಾಷಾಢ"),
+    ("Uttara Ashadha", "Uttara Ashadha", "ಉತ್ತರಾಷಾಢ"),
+    ("Shravana", "Shravana", "ಶ್ರವಣ"),
+    ("Dhanishta", "Dhanishta", "ಧನಿಷ್ಠಾ"),
+    ("Shatabhisha", "Shatabhisha", "ಶತಭಿಷಾ"),
+    ("Purva Bhadrapada", "Purva Bhadrapada", "ಪೂರ್ವಾಭಾದ್ರಪದ"),
+    ("Uttara Bhadrapada", "Uttara Bhadrapada", "ಉತ್ತರಾಭಾದ್ರಪದ"),
+    ("Revati", "Revati", "ರೇವತಿ"),
+    ("Other", "Other (type below)", "ಇತರೆ (ಕೆಳಗೆ ಬರೆಯಿರಿ)"),
+]
+
+MASAS = [
+    ("Chaitra", "Chaitra", "ಚೈತ್ರ"),
+    ("Vaishakha", "Vaishakha", "ವೈಶಾಖ"),
+    ("Jyeshtha", "Jyeshtha", "ಜ್ಯೇಷ್ಠ"),
+    ("Ashadha", "Ashadha", "ಆಷಾಢ"),
+    ("Shravana", "Shravana", "ಶ್ರಾವಣ"),
+    ("Bhadrapada", "Bhadrapada", "ಭಾದ್ರಪದ"),
+    ("Ashwayuja", "Ashwayuja (Ashwina)", "ಆಶ್ವಯುಜ"),
+    ("Kartika", "Kartika", "ಕಾರ್ತಿಕ"),
+    ("Margashira", "Margashira (Margashirsha)", "ಮಾರ್ಗಶಿರ"),
+    ("Pushya", "Pushya", "ಪುಷ್ಯ"),
+    ("Magha", "Magha", "ಮಾಘ"),
+    ("Phalguna", "Phalguna", "ಫಾಲ್ಗುಣ"),
+    ("Adhika Masa", "Adhika Masa (leap month)", "ಅಧಿಕ ಮಾಸ"),
+]
+
+PAKSHAS = [
+    ("Shukla", "Shukla Paksha", "ಶುಕ್ಲ ಪಕ್ಷ"),
+    ("Krishna", "Krishna Paksha", "ಕೃಷ್ಣ ಪಕ್ಷ"),
+]
+
+THITHIS = [
+    ("Prathama", "Prathama", "ಪ್ರಥಮಾ"),
+    ("Dwitiya", "Dwitiya", "ದ್ವಿತೀಯಾ"),
+    ("Tritiya", "Tritiya", "ತೃತೀಯಾ"),
+    ("Chaturthi", "Chaturthi", "ಚತುರ್ಥಿ"),
+    ("Panchami", "Panchami", "ಪಂಚಮಿ"),
+    ("Shashti", "Shashti", "ಷಷ್ಠಿ"),
+    ("Saptami", "Saptami", "ಸಪ್ತಮಿ"),
+    ("Ashtami", "Ashtami", "ಅಷ್ಟಮಿ"),
+    ("Navami", "Navami", "ನವಮಿ"),
+    ("Dashami", "Dashami", "ದಶಮಿ"),
+    ("Ekadashi", "Ekadashi", "ಏಕಾದಶಿ"),
+    ("Dwadashi", "Dwadashi", "ದ್ವಾದಶಿ"),
+    ("Trayodashi", "Trayodashi", "ತ್ರಯೋದಶಿ"),
+    ("Chaturdashi", "Chaturdashi", "ಚತುರ್ದಶಿ"),
+    ("Purnima", "Purnima (Shukla only)", "ಪೂರ್ಣಿಮಾ"),
+    ("Amavasya", "Amavasya (Krishna only)", "ಅಮಾವಾಸ್ಯೆ"),
+]
+
+GOTHRAS = [
+    ("Bharadwaja", "Bharadwaja", "ಭಾರದ್ವಾಜ"),
+    ("Vasishtha", "Vasishtha", "ವಸಿಷ್ಠ"),
+    ("Kashyapa", "Kashyapa", "ಕಶ್ಯಪ"),
+    ("Atri", "Atri", "ಅತ್ರಿ"),
+    ("Vishwamitra", "Vishwamitra", "ವಿಶ್ವಾಮಿತ್ರ"),
+    ("Jamadagni", "Jamadagni", "ಜಮದಗ್ನಿ"),
+    ("Gautama", "Gautama", "ಗೌತಮ"),
+    ("Agastya", "Agastya", "ಅಗಸ್ತ್ಯ"),
+    ("Kaundinya", "Kaundinya", "ಕೌಂಡಿನ್ಯ"),
+    ("Shandilya", "Shandilya", "ಶಾಂಡಿಲ್ಯ"),
+    ("Harita", "Harita", "ಹಾರಿತ"),
+    ("Kutsa", "Kutsa", "ಕುತ್ಸ"),
+    ("Mudgala", "Mudgala", "ಮುದ್ಗಲ"),
+    ("Parashara", "Parashara", "ಪರಾಶರ"),
+    ("Kaushika", "Kaushika", "ಕೌಶಿಕ"),
+    ("Bhrigu", "Bhrigu", "ಭೃಗು"),
+    ("Angirasa", "Angirasa", "ಆಂಗೀರಸ"),
+    ("Kapila", "Kapila", "ಕಪಿಲ"),
+    ("Srivatsa", "Srivatsa", "ಶ್ರೀವತ್ಸ"),
+    ("Other", "Other (type below)", "ಇತರೆ (ಕೆಳಗೆ ಬರೆಯಿರಿ)"),
+]

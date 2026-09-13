@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>{{ site_name }} — Admin</h1>
+<p class="sub"><a href="{{ url_for('admin_logout') }}">Logout</a></p>
+
+<h2>Root Person <span class="kn">/ ಮೂಲ ವ್ಯಕ್ತಿ</span></h2>
+<div class="card">
+  {% if root %}
+    <div class="tree-row">{{ root.name }}{% if root.name_kn %} / {{ root.name_kn }}{% endif %}</div>
+    <a class="btn" href="{{ url_for('admin_root_home') }}">View / manage their family tree</a>
+  {% else %}
+    <p>No root person yet. Create them first, then add their spouse and children from the tree page.</p>
+    <a class="btn" href="{{ url_for('admin_root_create') }}">+ Create root person</a>
+  {% endif %}
+</div>
+
+<h2>Branches (one link per family)</h2>
+<div class="card">
+  {% if branches %}
+    {% for b in branches %}
+      <div class="tree-row">
+        <strong><a href="{{ url_for('branch_home', token=b.token) }}">{{ b.label }}</a></strong> — anchored to {{ b.anchor_person.name }}
+        <span class="tag">{{ b.status }}</span><br>
+        <small>/branch/{{ b.token }}</small>
+        {% if b.contact_name %} — contact: {{ b.contact_name }} {{ b.contact_phone }}{% endif %}
+      </div>
+    {% endfor %}
+  {% else %}
+    <p>No branches created yet. Add the root person's sons/daughters first, then create a branch for each family.</p>
+  {% endif %}
+  {% if root %}
+    <a class="btn" href="{{ url_for('admin_add_branch') }}">+ Create a branch link</a>
+  {% endif %}
+</div>
+{% endblock %}

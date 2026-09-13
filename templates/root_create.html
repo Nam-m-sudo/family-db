@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Create Root Person <span class="kn">/ ಮೂಲ ವ್ಯಕ್ತಿಯನ್ನು ಸೇರಿಸಿ</span></h1>
+<p class="sub">This is the one person everyone else in the tree descends from. You'll add their spouse and children next, from the family tree page, the same way each branch family adds theirs.</p>
+
+<div class="card">
+  <form method="post">
+    <div class="row2">
+      <div>
+        <label for="name">Name (English) <span class="kn">/ ಹೆಸರು</span></label>
+        <input type="text" name="name" id="name" required>
+      </div>
+      <div>
+        <label for="name_kn">Name (Kannada) <span class="kn">/ ಹೆಸರು (ಕನ್ನಡ)</span></label>
+        <input type="text" name="name_kn" id="name_kn">
+        <div class="hint">Fills in as you type the English name — please check and correct it.</div>
+      </div>
+    </div>
+
+    <div class="row2">
+      <div>
+        <label>Gender <span class="kn">/ ಲಿಂಗ</span></label>
+        <select name="gender" id="gender">
+          {% for g in genders %}<option value="{{ g }}">{{ g }}</option>{% endfor %}
+        </select>
+      </div>
+      <div>
+        <label>Status <span class="kn">/ ಸ್ಥಿತಿ</span></label>
+        <select name="alive_status" id="alive_status">
+          {% for s in statuses %}<option value="{{ s }}">{{ s }}{% if s == 'Alive' %} / ಜೀವಂತ{% else %} / ಮೃತ{% endif %}</option>{% endfor %}
+        </select>
+      </div>
+    </div>
+
+    <div class="row2">
+      <div>
+        <label for="dob">Date of birth (DD-MM-YYYY) <span class="kn">/ ಜನ್ಮ ದಿನಾಂಕ</span></label>
+        <input type="text" name="dob" id="dob" placeholder="e.g. 15-06-1948">
+      </div>
+      <div>
+        <label for="dod">Date of death, if applicable <span class="kn">/ ಮರಣ ದಿನಾಂಕ</span></label>
+        <input type="text" name="dod" id="dod" placeholder="DD-MM-YYYY">
+      </div>
+    </div>
+
+    <div class="hint">Masa / Paksha / Thithi at death, if applicable — used to fix the yearly shraddha date <span class="kn">/ ಮರಣ ಮಾಸ, ಪಕ್ಷ, ತಿಥಿ</span></div>
+    <div class="row2">
+      <div>
+        <label for="dod_masa">Masa <span class="kn">/ ಮಾಸ</span></label>
+        <select name="dod_masa" id="dod_masa">
+          <option value="">—</option>
+          {% for key, en, kn in masas %}<option value="{{ key }}">{{ en }} / {{ kn }}</option>{% endfor %}
+        </select>
+      </div>
+      <div>
+        <label for="dod_paksha">Paksha <span class="kn">/ ಪಕ್ಷ</span></label>
+        <select name="dod_paksha" id="dod_paksha">
+          <option value="">—</option>
+          {% for key, en, kn in pakshas %}<option value="{{ key }}">{{ en }} / {{ kn }}</option>{% endfor %}
+        </select>
+      </div>
+      <div>
+        <label for="dod_thithi">Thithi <span class="kn">/ ತಿಥಿ</span></label>
+        <select name="dod_thithi" id="dod_thithi">
+          <option value="">—</option>
+          {% for key, en, kn in thithis %}<option value="{{ key }}">{{ en }} / {{ kn }}</option>{% endfor %}
+        </select>
+      </div>
+    </div>
+
+    <div class="row2">
+      <div>
+        <label for="nakshatra">Nakshatra <span class="kn">/ ನಕ್ಷತ್ರ</span></label>
+        <select name="nakshatra" id="nakshatra" onchange="toggleOther('nakshatra')">
+          <option value="">—</option>
+          {% for key, en, kn in nakshatras %}<option value="{{ key }}">{{ en }} / {{ kn }}</option>{% endfor %}
+        </select>
+        <div id="nakshatra_other_wrap" style="display:none;">
+          <label for="nakshatra_other">Type the nakshatra <span class="kn">/ ನಕ್ಷತ್ರ ಬರೆಯಿರಿ</span></label>
+          <input type="text" name="nakshatra_other" id="nakshatra_other">
+        </div>
+      </div>
+      <div>
+        <label for="gothra">Gothra <span class="kn">/ ಗೋತ್ರ</span></label>
+        <select name="gothra" id="gothra" onchange="toggleOther('gothra')">
+          <option value="">—</option>
+          {% for key, en, kn in gothras %}<option value="{{ key }}">{{ en }} / {{ kn }}</option>{% endfor %}
+        </select>
+        <div id="gothra_other_wrap" style="display:none;">
+          <label for="gothra_other">Type the gothra <span class="kn">/ ಗೋತ್ರ ಬರೆಯಿರಿ</span></label>
+          <input type="text" name="gothra_other" id="gothra_other">
+        </div>
+      </div>
+    </div>
+
+    <label for="address">Address <span class="kn">/ ವಿಳಾಸ</span></label>
+    <textarea name="address" id="address" rows="2"></textarea>
+
+    <div class="row2">
+      <div>
+        <label for="phone">Phone <span class="kn">/ ಫೋನ್ ನಂಬರ್</span></label>
+        <input type="text" name="phone" id="phone">
+      </div>
+      <div>
+        <label for="email">Email <span class="kn">/ ಇಮೇಲ್</span></label>
+        <input type="email" name="email" id="email">
+      </div>
+    </div>
+
+    <label for="maps_link">Google Maps house link, optional <span class="kn">/ ಗೂಗಲ್ ಮ್ಯಾಪ್ಸ್ ಮನೆ ಲಿಂಕ್</span></label>
+    <input type="text" name="maps_link" id="maps_link">
+
+    <button type="submit">Create <span class="kn">/ ರಚಿಸಿ</span></button>
+  </form>
+</div>
+<p><a href="{{ url_for('admin_dashboard') }}">&larr; Back to dashboard</a></p>
+
+<script>
+function toggleOther(field) {
+  var val = document.getElementById(field).value;
+  document.getElementById(field + '_other_wrap').style.display = (val === 'Other') ? 'block' : 'none';
+}
+var lastKnSuggestion = "";
+var knTimer = null;
+document.getElementById('name').addEventListener('input', function () {
+  var name = this.value.trim();
+  clearTimeout(knTimer);
+  if (!name) return;
+  knTimer = setTimeout(function () {
+    fetch('/api/transliterate?text=' + encodeURIComponent(name))
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        if (!data.kannada) return;
+        var knField = document.getElementById('name_kn');
+        if (knField.value === lastKnSuggestion || knField.value === '') {
+          knField.value = data.kannada;
+          lastKnSuggestion = data.kannada;
+        }
+      })
+      .catch(function () {});
+  }, 350);
+});
+</script>
+{% endblock %}
